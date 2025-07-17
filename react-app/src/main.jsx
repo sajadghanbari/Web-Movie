@@ -9,6 +9,7 @@ import Genres from './components/Genres.jsx';
 import EditMovie from './components/EditMovie.jsx';
 import ManageCatalogue from './components/ManageCatalogue.jsx';
 import GraphQL from './components/GraphQL.jsx';
+import Login from './components/Login.jsx';
 
 const router = createBrowserRouter([
   {
@@ -28,17 +29,21 @@ const router = createBrowserRouter([
         path: '/genres',
         element: <Genres />
       },
-            {
+      {
         path: '/admin/add-movie',
         element: <EditMovie />
       },
-            {
+      {
         path: '/admin/manage-catalogue',
         element: <ManageCatalogue />
       },
-            {
+      {
         path: '/graphql',
         element: <GraphQL />
+      },
+      {
+        path: '/login',
+        element: <Login />
       },
     ]
   },
