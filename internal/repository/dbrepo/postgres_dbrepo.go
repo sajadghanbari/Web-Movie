@@ -13,27 +13,30 @@ type PostgresDBRepo struct {
 
 const dbTimeout = time.Second * 3
 
-func (m *PostgresDBRepo) AllMovies() ([]*models.Movie,error){
-	ctx , cancel := context.WithTimeout(context.Background(),dbTimeout)
+func (m *PostgresDBRepo) Connection() *sql.DB {
+	return m.DB
+}
+
+func (m *PostgresDBRepo) AllMovies() ([]*models.Movie, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
-	
+
 	query := `
 		select
 			id, title, release_date, runtime,
-			mpaa_rating, description, coalesce(image,''),
+			mpaa_rating, description, coalesce(image, ''),
 			created_at, updated_at
 		from
-			movies\
+			movies
 		order by
 			title
 	`
 
 	rows, err := m.DB.QueryContext(ctx, query)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
 
 	var movies []*models.Movie
 
@@ -51,10 +54,10 @@ func (m *PostgresDBRepo) AllMovies() ([]*models.Movie,error){
 			&movie.UpdatedAt,
 		)
 		if err != nil {
-			return  nil,err
+			return nil, err
 		}
-		movies = append(movies , &movie)
+		movies = append(movies, &movie)
 	}
 
-	return  movies,nil
+	return movies, nil
 }
