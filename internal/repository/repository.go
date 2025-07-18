@@ -1,5 +1,7 @@
 package repository
 
-type DatabaseRepo interface{
-	
+import "backend/internal/models"
+
+type DatabaseRepo interface {
+	AllMovies() ([]*models.Movie,error)
 }
