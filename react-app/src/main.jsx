@@ -13,42 +13,41 @@ import Login from './components/Login.jsx';
 
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <App />,
     children: [
-      { index: true, element: <Home /> },
+      {index: true, element: <Home /> },
       {
-        path: '/movies',
-        element: <Movies />
+        path: "/movies",
+        element: <Movies />,
       },
       {
-        path: '/movies/:id',
-        element: <Movie />
+        path: "/movies/:id",
+        element: <Movie />,
       },
       {
-        path: '/genres',
-        element: <Genres />
+        path: "/genres",
+        element: <Genres />,
       },
       {
-        path: '/admin/add-movie',
-        element: <EditMovie />
+        path: "/admin/movie/0",
+        element: <EditMovie />,
       },
       {
-        path: '/admin/manage-catalogue',
-        element: <ManageCatalogue />
+        path: "/manage-catalogue",
+        element: <ManageCatalogue />,
       },
       {
-        path: '/graphql',
-        element: <GraphQL />
+        path: "/graphql",
+        element: <GraphQL />,
       },
       {
-        path: '/login',
-        element: <Login />
+        path: "/login",
+        element: <Login />,
       },
     ]
-  },
-]);
-
+  }
+])
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <RouterProvider router={router} />
