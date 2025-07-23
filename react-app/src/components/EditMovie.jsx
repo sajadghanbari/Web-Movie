@@ -28,6 +28,21 @@ const EditMovie = () => {
     const handleCheck = (event , position) =>{
         console.log("handle")
         console.log(event.target.value)
+
+        let tmpArr = movie.genres;
+        tmpArr[position].checked = !tmpArr[position].checked
+
+        let tmpIDs = movie.genres_array;
+        if (!event.target.checked){
+            tmpIDs.splice(tmpIDs.indexOf(event.target.value));
+        }else{
+            tmpIDs.push(parseInt(event.target.value,10))
+        }
+
+        setMovie({
+            ...movie,
+            genres_array: tmpIDs
+        })
     }
     const [movie, setMovie] = useState({
         id: 0,
