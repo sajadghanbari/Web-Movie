@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useParams } from "react-router";
 import Input from "./form/Input";
 import Select from "./form/Select";
 import TextArea from "./form/TextArea";
+import Checkbox from "./form/CheckBox";
 
 const EditMovie = () => {
     const navigate = useNavigate();
@@ -12,18 +13,22 @@ const EditMovie = () => {
     const [errors, setErrors] = useState([]);
 
     const mpaaOptions = [
-        {id: "G", value: "G"},
-        {id: "PG", value: "PG"},
-        {id: "PG13", value: "PG13"},
-        {id: "R", value: "R"},
-        {id: "NC17", value: "NC17"},
-        {id: "18A", value: "18A"},
+        { id: "G", value: "G" },
+        { id: "PG", value: "PG" },
+        { id: "PG13", value: "PG13" },
+        { id: "R", value: "R" },
+        { id: "NC17", value: "NC17" },
+        { id: "18A", value: "18A" },
     ]
 
     const hasError = (key) => {
         return errors.indexOf(key) !== -1;
     }
 
+    const handleCheck = (event , position) =>{
+        console.log("handle")
+        console.log(event.target.value)
+    }
     const [movie, setMovie] = useState({
         id: 0,
         title: "",
@@ -31,10 +36,15 @@ const EditMovie = () => {
         runtime: "",
         mpaa_rating: "",
         description: "",
+        genres: [],
+        genres_array: [Array(13).fill(false)],
     })
 
     // get id from the URL
-    let {id} = useParams();
+    let { id } = useParams();
+    if (id === undefined) {
+        id = 0;
+    }
 
     useEffect(() => {
         if (jwtToken === "") {
@@ -42,7 +52,49 @@ const EditMovie = () => {
             return;
         }
 
-    }, [jwtToken, navigate])
+        if (id === 0) {
+            setMovie({
+                id: 0,
+                title: "",
+                release_date: "",
+                runtime: "",
+                mpaa_rating: "",
+                description: "",
+                genres: [],
+                genres_array: [Array(13).fill(false)],
+            })
+            
+            const headers = new Headers();
+            headers.append("Content-Type","application/json")
+            const requestOptions = {
+                method: "GET",
+                headers: headers,
+            }
+
+            fetch(`http://localhost:8080/genres`,requestOptions)
+                .then((response) => response.json())
+                .then((data)=>{
+                    const checks = [];
+
+                    data.forEach(g => {
+                        checks.push({id: g.id, checked: false, genre: g.genre})
+                    })
+
+                    setMovie(m =>({
+                        ...movie,
+                        genres: checks,
+                        genres_array: [],
+                    }))
+
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        } else {
+
+        }
+
+    }, [id,jwtToken, navigate])
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -57,7 +109,7 @@ const EditMovie = () => {
         })
     }
 
-    return(
+    return (
         <div>
             <h2>Add/Edit Movie</h2>
             <hr />
@@ -122,8 +174,22 @@ const EditMovie = () => {
                 <hr />
 
                 <h3>Genres</h3>
-                
 
+                 {movie.genres && movie.genres.length > 1 &&
+                     <>
+                         {Array.from(movie.genres).map((g, index) =>
+                             <Checkbox
+                                 title={g.genre}
+                                 name={"genre"}
+                                 key={index}
+                                 id={"genre-" + index}
+                                 onChange={(event) => handleCheck(event, index)}
+                                 value={g.id}
+                                 checked={movie.genres[index].checked}
+                             />
+                         )}
+                     </>
+                 }
 
             </form>
         </div>
