@@ -2,8 +2,13 @@ package main
 
 import (
 	"backend/internal/models"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
@@ -168,54 +173,100 @@ func (app *application) MovieForEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	movie , genres , err := app.DB.OneMovieForEdit(movieID)
+	movie, genres, err := app.DB.OneMovieForEdit(movieID)
 	if err != nil {
-		app.errorJSON(w,err)
+		app.errorJSON(w, err)
 		return
 	}
 	var payload = struct {
-		Movie *models.Movie `json:"movie"`
+		Movie  *models.Movie   `json:"movie"`
 		Genres []*models.Genre `json:"genres"`
 	}{
 		movie,
 		genres,
 	}
 
-	_ = app.writeJSON(w , http.StatusOK, payload)
-
+	_ = app.writeJSON(w, http.StatusOK, payload)
 
 }
 
-func (app *application) AllGenres(w http.ResponseWriter, r *http.Request){
-	genres , err := app.DB.AllGenres()
-	if err !=nil{
-		app.errorJSON(w,err)
+func (app *application) AllGenres(w http.ResponseWriter, r *http.Request) {
+	genres, err := app.DB.AllGenres()
+	if err != nil {
+		app.errorJSON(w, err)
 		return
 	}
 
-	_ = app.writeJSON(w,http.StatusOK,genres)
+	_ = app.writeJSON(w, http.StatusOK, genres)
 
 }
 
-func(app *application) InsertMovie(w http.ResponseWriter, r *http.Request){
+func (app *application) InsertMovie(w http.ResponseWriter, r *http.Request) {
 	var movie models.Movie
 
-	err := app.readJSON(w,r,&movie)
+	err := app.readJSON(w, r, &movie)
 
-	if err!= nil{
-		app.errorJSON(w,err)
+	if err != nil {
+		app.errorJSON(w, err)
 		return
 	}
 
 	//try to get an image
-
-
-	//handle genres
 	
+	//handle genres
+
 	resp := JSONResponse{
-		Error: false,
+		Error:   false,
 		Message: "Movie Updated",
 	}
 
-	app.writeJSON(w,http.StatusAccepted,resp)
+	app.writeJSON(w, http.StatusAccepted, resp)
+}
+
+func (app *application) getPoster(movie models.Movie) models.Movie {
+	type TheMovieDB struct {
+		Page   int `json:"page"`
+		Results []struct {
+			PosterPath string `json:"poster_path"`
+		} `json:"results"`
+		TotalPages int `json:"total_pages"`
+	}
+
+	client := &http.Client{}
+	theUrl := fmt.Sprintf("https://api.themoviedb.org/3/search/movie?api_key=%s", app.APIKey)
+
+	req, err := http.NewRequest("GET", theUrl+"&query"+url.QueryEscape(movie.Title), nil)
+
+	if err != nil {
+		log.Println(err)
+		return movie
+	}
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(req)
+
+	if err != nil {
+		log.Println(err)
+		return movie
+	}
+
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Println(err)
+		return movie
+	}
+
+	var responseObject TheMovieDB
+
+	json.Unmarshal(bodyBytes, &responseObject)
+
+	if len(responseObject.Results) > 0 {
+		movie.Image = responseObject.Results[0].PosterPath
+	}
+
+	return movie
+
 }
