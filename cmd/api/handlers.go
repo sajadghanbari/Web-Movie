@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/golang-jwt/jwt/v4"
@@ -212,9 +213,25 @@ func (app *application) InsertMovie(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//try to get an image
-	
+	movie = app.getPoster(movie)
+	movie.CreatedAt = time.Now()
+	movie.UpdatedAt = time.Now()
+
+	newId, err := app.DB.InsertMovie(movie)
+
+		if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+
 	//handle genres
 
+	err = app.DB.UpdateMovieGenres(newId,movie.GenresArray)
+		if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
 	resp := JSONResponse{
 		Error:   false,
 		Message: "Movie Updated",
@@ -270,3 +287,4 @@ func (app *application) getPoster(movie models.Movie) models.Movie {
 	return movie
 
 }
+
