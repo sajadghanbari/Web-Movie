@@ -17,7 +17,7 @@ function App() {
       credentials: "include",
     }
 
-    fetch(`/logout`, requestOptions)
+    fetch(`http://localhost:8080/api/logout`, requestOptions)
     .catch(error => {
       console.log("error logging out", error);
     })
@@ -51,7 +51,7 @@ function App() {
         .catch(error => {
           console.log(error);
         })
-      }, 600000);
+      }, 60000);
       setTickInterval(i);
       console.log("setting tick interval to", i);
     } else {
