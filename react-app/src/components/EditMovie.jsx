@@ -22,7 +22,7 @@ const EditMovie = () => {
     ]
 
     const hasError = (key) => {
-        return errors.indexOf(key) !== -1;
+        return error.indexOf(key) !== -1;
     }
 
     const handleCheck = (event , position) =>{
@@ -113,6 +113,25 @@ const EditMovie = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+
+        let errors = [];
+        let required = [
+            {field: movie.title , name: "title"},
+            {field: movie.release_data , name: "release_data"},
+            {field: movie.runtime , name: "runtime"},
+            {field: movie.description , name: "description"},
+            {field: movie.mpaa_rating , name: "mpaa_rating"},
+        ]
+        required.forEach(function (obj){
+            if(obj.field === ""){
+                errors.push(obj.name);
+            }
+        })
+        setError(errors);
+
+        if(errors.length > 0){
+            return false
+        }
     }
 
     const handleChange = () => (event) => {
@@ -205,6 +224,10 @@ const EditMovie = () => {
                          )}
                      </>
                  }
+
+                 <hr />
+
+                 <button className='btn btn-primary'>Save</button>
 
             </form>
         </div>
