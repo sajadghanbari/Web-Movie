@@ -185,3 +185,14 @@ func (app *application) MovieForEdit(w http.ResponseWriter, r *http.Request) {
 
 
 }
+
+func (app *application) AllGenres(w http.ResponseWriter, r *http.Request){
+	genres , err := app.DB.AllGenres()
+	if err !=nil{
+		app.errorJSON(w,err)
+		return
+	}
+
+	_ = app.writeJSON(w,http.StatusOK,genres)
+
+}
