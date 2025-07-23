@@ -1,7 +1,7 @@
 
 import React from 'react';
 
-const TextArea = () => {
+const TextArea = (props) => {
     return (
         <div className='mb-3'>
             <label htmlFor={props.name} className='form-label'>
