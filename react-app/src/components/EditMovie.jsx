@@ -4,6 +4,7 @@ import Input from "./form/Input";
 import Select from "./form/Select";
 import TextArea from "./form/TextArea";
 import Checkbox from "./form/CheckBox";
+import Swal from "sweetalert2";
 
 const EditMovie = () => {
     const navigate = useNavigate();
@@ -22,8 +23,9 @@ const EditMovie = () => {
     ]
 
     const hasError = (key) => {
-        return error.indexOf(key) !== -1;
+        return errors.indexOf(key) !== -1;
     }
+
 
     const handleCheck = (event , position) =>{
         console.log("handle")
@@ -117,7 +119,7 @@ const EditMovie = () => {
         let errors = [];
         let required = [
             {field: movie.title , name: "title"},
-            {field: movie.release_data , name: "release_data"},
+            {field: movie.release_date , name: "release_date"},
             {field: movie.runtime , name: "runtime"},
             {field: movie.description , name: "description"},
             {field: movie.mpaa_rating , name: "mpaa_rating"},
@@ -127,7 +129,18 @@ const EditMovie = () => {
                 errors.push(obj.name);
             }
         })
-        setError(errors);
+
+        if ( movie.genres_array.length === 0){
+            Swal.fire({
+                title: 'Error!',
+                text: 'You must choose at least one genre!',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            })
+            errors.push("genres");
+        }
+
+        setErrors(errors);
 
         if(errors.length > 0){
             return false

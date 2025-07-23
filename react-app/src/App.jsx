@@ -41,7 +41,7 @@ function App() {
           credentials: "include",
         }
 
-        fetch(`/refresh`, requestOptions)
+        fetch(`http://localhost:8080/refresh`, requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (data.access_token) {
@@ -69,7 +69,7 @@ function App() {
         credentials: "include",
       }
 
-      fetch(`/refresh`, requestOptions)
+      fetch(`http://localhost:8080/refresh`, requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (data.access_token) {
